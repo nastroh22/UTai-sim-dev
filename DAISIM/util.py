@@ -1,8 +1,67 @@
 from scipy.stats import truncnorm
 from datetime import datetime
+from dataclasses import dataclass
+import numpy as np
+from gbm import gen_paths
+
+############################################################################################################
+@dataclass
+class SimState:
+    num_investors: int
+    belief_factor: int
+    lambdas: np.ndarray
+    agent_type: str # Initialize agents with normal distribution over assets
+    days_per_config: int  # Simulate two weeks of data
+    runs: int
+    eth_price_per_day: list
+    cdp_rate : float
+    tx_fee: float
+    rho: float
 
 def parse_config():
-    return
+    return 
+
+def set_defaults(sample=10,days=14):
+    num_investors=sample # NOTE: 10 is more overhead, maybe use some combinatorial amount which accounts for parameters λ, Β?
+    belief_factor=20
+    risk_lambdas=np.ones(num_investors)*.005
+    agent_type="normal"  # Initialize agents with normal distribution over assets
+    days_per_config=days   # Simulate two weeks of data (default of 14)
+    runs=1
+    apath=gen_paths(100. , r=.005, sigma=.02, M=24*days, T=days, I=runs)
+    print(apath.shape)
+    eth_price_per_day=list(apath.squeeze())[::24][0:days]
+    init_cdp_rate=.06
+    init_tx_fee=.02
+    init_rho=2.5 # TODO : generalize to a list of params (distribution over users)
+
+    return SimState(
+        num_investors,
+        belief_factor,
+        risk_lambdas,
+        agent_type,
+        days_per_config,
+        runs,
+        eth_price_per_day,
+        init_cdp_rate,
+        init_tx_fee,
+        init_rho
+    )
+
+### Manually Set the Parameters From Config 
+"""
+    print("Input Parameters for Test")
+    print("--investors", args.investors)
+    print("--days_per_config", args.days_per_config)
+    print("--type", args.type)
+    print("--runs", args.runs)
+    print("--log", args.log)
+    print("--logidr", args.logdir)
+    print("--config", args.config)
+"""
+
+### NOTE: ############################################################################################################
+
 
 def printAssets(x, eth_price, dai_price, rho):
     print("========= Assets ============")

@@ -13,7 +13,7 @@ def get_risk_params(n):
 def get_assets(n, dist="normal"):
     """
         NOTE:
-        - Starting distribution of agent portfolios 
+            - Starting distribution of agent portfolios
     """
     if dist == "uniform":
         assets = []
@@ -57,7 +57,6 @@ def price_update(curr):
 
     return 0.001 # modified
 
-
 def find_actual_allocation(stats, dai_price, eth_price, rho, txfee):
     buy_dai = []
     sell_dai = []
@@ -65,7 +64,7 @@ def find_actual_allocation(stats, dai_price, eth_price, rho, txfee):
     usd_holdings = []
 
     for i in stats:
-        dai_diff = i[1][2] - i[0][2]
+        dai_diff = i[1][2] - i[0][2] #NOTE: difference btwn desired and current D^{OV}
 
         # USD I hold initially
         usd_holdings.append(i[0][0])
@@ -108,7 +107,7 @@ def find_actual_allocation(stats, dai_price, eth_price, rho, txfee):
     sell_dai_actual = [i for i in sell_dai]
     buy_dai_actual = [i for i in buy_dai]
     if daib < dais != 0:
-        # sell proportionally!
+        # sell proportionally! #NOTE if more wants to be sold than bought, price should deflate
         # all buy orders met
         sell_dai_actual = [i / dais * daib for i in sell_dai]
     elif daib >= dais:
@@ -127,14 +126,18 @@ def find_actual_allocation(stats, dai_price, eth_price, rho, txfee):
     for i in range(len(stats)):
         stat_temp = [0, 0]
         stat_temp[0] = stats[i][0]
-        dai_holding = stats[i][0][2] + dai_actual[i]
+        dai_holding = stats[i][0][2] + dai_actual[i] #NOTE: This is their old portfolio (position 3 in portfolio -- which is old DAI holdings) and adds "ACTUAL DAI Diff"
         stat_temp[1] = [max(0, usd_holdings[i]), stats[i][1][1], dai_holding, stats[i][1][3]]
         updated_stats.append(stat_temp)
 
-    return updated_stats
+    return updated_stats # NOTE : so this returns old as well as the updated portfolio
+    
+    # NOTE: The updated portfolio bottoms out USD at $0 ( no negative holdaings)
+    # NOTE: It assumes they can achieve their exact actual desired cETH and ETH
+    # NOTE: We can also note that the desired cETH is fixed as a constraint to rho(CDP ratio) and is exact
+    # NOTE: Have we simulated CDP yet ?
 
-
-class Simulator:
+class Simulator: # NOTE:  Interesting this already sets default values hm...
     belief_factor = 10
     rho = 2.5
     cdpRate = 0.06
@@ -181,6 +184,12 @@ class Simulator:
         # dai_price = 1
         iterations = 100
 
+
+        # TODO (Rudra?): 
+        """
+        I would think it makes more sense to keep these at the sim level rather 
+        than recreate objects every time. This way we can also access evolving User behavior
+        """
         users = [User(self.initial_distribution[i], self.rho) for i in range(len(self.initial_distribution))]
 
         market_dai = 0
@@ -194,17 +203,12 @@ class Simulator:
             for j in range(self.sample_size):
                 risk_param = self.risk_params[j]
 
-                #NOTE: debugging only
-                # print("My Form: ", users[j].getAssets())
-                # print(j, "success", users[j].getAssets(),  self.rho, self.txf, self.cdpRate, risk_param,
-                #                            self.eth_price,)
-
                 proposed_assets = optimize(self.belief_factor, users[j].getAssets(), self.rho, self.txf, self.cdpRate, risk_param,
                                            self.eth_price,
                                            dai_price, False)
 
                 old_assets = users[j].getAssets()
-                stats.append([old_assets, proposed_assets])
+                stats.append([old_assets, proposed_assets]) # NOTE for each user pass along current and desired portfolio
 
             # perform buy/sell adjustment, if market player in action
             if self.market:
@@ -225,9 +229,13 @@ class Simulator:
                 cdpDAI = (new_assets[3] - old_assets[3]) * self.eth_price / dai_price / self.rho
 
                 # I think selling DAI equates to the same effect produced by CDP DAI generation
-                total_market_dai -= cdpDAI
+                total_market_dai -= cdpDAI # NOTE: so  "cdpDAI" is actually the DIFF between old and new asset portfolios
 
-            market_dai = total_market_dai
+            market_dai = total_market_dai  # NOTE: and this Market DAI is actually (well kind of like hidden variable )
+            # but it is actually the "free supply" on the market directly determines price
+            
+            # NOTE It's always reset to 0 from the last stage -- this makes sense because pariticipants are always rebalancing
+            # their cETH to their target amount ( this is what ultimately drives that burn/mint decision )
 
             if i % LOG_ITER == 0:
                 log("Total DAI in market %d" % market_dai, self.filename, self.logger)
