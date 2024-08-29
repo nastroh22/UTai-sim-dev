@@ -1,3 +1,8 @@
+## Branches
+- Ignore template and main for now
+- daisim_tests to see original daisim code
+- daisim_refactor is current dev branch -- integrates daisim with a pid controller
+
 ## Original DAISIM 
 
 With a few tweaks to get it working.
