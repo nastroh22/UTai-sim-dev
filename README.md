@@ -15,14 +15,14 @@ Is about building and testing julia integration. The HelloWorld README.md has mo
 ## Running
 - Will need an Julia Installation. Will need python and the listed python dependencies.
 - Will need to precompile HelloWorld package. Either do this in the Julia REPL
-`
+```
    cd HelloWorld/ \\
    julia \\
    ] \\
    activate . \\
    instantiate \\
    precompile \\
-`  
+```  
 - Or might work by uncommenting line 67 in julia_setup_tests.py
 - Then simply run 
    ` julia_setup_tests.py `
