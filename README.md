@@ -5,7 +5,7 @@ Ignore daisim stuff on this branch
 ## This Branch
 Is about building and testing julia integration. The HelloWorld README has some more information, but here is a basic overview of what happens so far:
    - We add a custom julia project locally to a python project home folder (here we're assuming the julia project has been developed previously)
-   - HelloWorld is our pre-developed julia package in this example
+   - HelloWorld is our pre-made julia package in this example
    - Then we install and instantiate the julia package from a local python script "julia_setup_test.py" 
    - Now the package works as if it were native to python. We can use pyjulia to simply import it like any other python package
    - We run a few tests calling the julia pacakges functions "hello.greet()", "hello.makeRandFrame()", "hello.checkDependencies()", "hello.
