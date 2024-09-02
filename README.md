@@ -13,10 +13,17 @@ Is about building and testing julia integration. The HelloWorld README has some 
      ```
    - We run a few tests calling the julia pacakges functions in the script:
      ```
-        hello.greet()", "hello.makeRandFrame()", "hello.checkDependencies()", "hello.readSomeData()", "hello.plotSomeData()"
+        hello.greet()", "hello.checkDependencies()", "hello.makeRandFrame()"
      ```
+     ![image](https://github.com/user-attachments/assets/52dddacc-b3d1-4b8f-a649-e07119ce80e7)
 
-   - Finally, we test passing some data back and forth. The HelloWorld package receives soem data read in by pandas.to_csv() method and plots it using the julia-native Plots.jl package with "hello.readSomeData()" , ""hello.plotSomeData()"
+
+   - Finally, we test passing some data back and forth. hello receives data read in by pandas.to_csv() method and plots it using Plots.jl
+     ```
+        "hello.readSomeData()" , ""hello.plotSomeData()"
+     ```
+     ![plot](https://github.com/user-attachments/assets/13d8547f-4748-45a5-b330-2e2fc4862003)
+
 
 ## Running
    - Will need an Julia Installation. Will need python and the listed python dependencies.
