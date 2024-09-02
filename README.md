@@ -14,6 +14,9 @@ Is about building and testing julia integration. The HelloWorld README.md has mo
 
 ## Running
 - Will need an Julia Installation. Will need python and the listed python dependencies.
+```
+   pip install -r requirements.txt
+```
 - Will need to precompile HelloWorld package. Either do this in the Julia REPL
 ```
    cd HelloWorld
@@ -22,10 +25,12 @@ Is about building and testing julia integration. The HelloWorld README.md has mo
    activate .
    instantiate
    precompile
-```  
-- Or might work by uncommenting line 67 in julia_setup_tests.py
+```
+ ... Or it might work to just uncomment line 67 in julia_setup_tests.py (haven't tried it myself)
 - Then simply run 
-   ` julia_setup_tests.py `
+```
+   python3 julia_setup_tests.py
+```
 
 ## To Do:
 - Test with ParametericMPCs
